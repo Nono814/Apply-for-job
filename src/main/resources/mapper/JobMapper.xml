@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.hello.mapper.JobMapper">
+
+    <!-- 结果映射 -->
+    <resultMap id="JobWithCompanyMap" type="com.example.hello.entity.Job">
+        <id property="id" column="job_id"/>
+        <result property="companyId" column="company_id"/>
+        <result property="title" column="title"/>
+        <result property="employmentType" column="employment_type"/>
+        <result property="workStyle" column="work_style"/>
+        <result property="salaryMin" column="salary_min"/>
+        <result property="salaryMax" column="salary_max"/>
+        <result property="salaryCurrency" column="salary_currency"/>
+        <result property="salaryPeriod" column="salary_period"/>
+        <association property="company" javaType="com.example.hello.entity.Company">
+            <id property="id" column="company_id"/>
+            <result property="name" column="company_name"/>
+            <result property="logoUrl" column="logo_url"/>
+        </association>
+    </resultMap>
+
+    <!-- 根据ID查询职位详情（包含公司信息） -->
+    <select id="selectJobWithCompanyById" resultMap="JobWithCompanyMap">
+        SELECT 
+            j.id as job_id,
+            j.company_id,
+            j.title,
+            j.employment_type,
+            j.work_style,
+            j.salary_min,
+            j.salary_max,
+            j.salary_currency,
+            j.salary_period,
+            c.id as company_id,
+            c.name as company_name,
+            c.logo_url
+        FROM jobs j
+        LEFT JOIN companies c ON j.company_id = c.id
+        WHERE j.id = #{id}
+    </select>
+
+    <!-- 根据ID查询职位基本信息 -->
+    <select id="selectById" resultType="com.example.hello.entity.Job">
+        SELECT 
+            id,
+            company_id,
+            title,
+            employment_type,
+            work_style,
+            salary_min,
+            salary_max,
+            salary_currency,
+            salary_period
+        FROM jobs
+        WHERE id = #{id}
+    </select>
+
+    <!-- 分页查询职位列表（包含公司信息） -->
+    <select id="selectJobListWithCompany" resultMap="JobWithCompanyMap">
+        SELECT 
+            j.id as job_id,
+            j.company_id,
+            j.title,
+            j.employment_type,
+            j.work_style,
+            j.salary_min,
+            j.salary_max,
+            j.salary_currency,
+            j.salary_period,
+            c.id as company_id,
+            c.name as company_name,
+            c.logo_url
+        FROM jobs j
+        LEFT JOIN companies c ON j.company_id = c.id
+        ORDER BY j.id DESC
+    </select>
+
+    <!-- 统计职位总数 -->
+    <select id="countJobs" resultType="int">
+        SELECT COUNT(*) FROM jobs
+    </select>
+
+</mapper> 

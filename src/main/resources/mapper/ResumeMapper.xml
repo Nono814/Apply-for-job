@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.hello.mapper.ResumeMapper">
+
+    <!-- 插入新简历 -->
+    <insert id="insert" parameterType="com.example.hello.entity.Resume" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO resumes (user_id, file_path, original_filename, file_size, is_default)
+        VALUES (#{userId}, #{filePath}, #{originalFilename}, #{fileSize}, #{isDefault})
+    </insert>
+
+    <!-- 根据用户ID查询简历列表 -->
+    <select id="selectByUserId" resultType="com.example.hello.entity.Resume">
+        SELECT 
+            id,
+            user_id as userId,
+            file_path as filePath,
+            original_filename as originalFilename,
+            file_size as fileSize,
+            is_default as isDefault,
+            uploaded_at as uploadedAt
+        FROM resumes
+        WHERE user_id = #{userId}
+        ORDER BY uploaded_at DESC
+    </select>
+
+    <!-- 根据ID查询简历 -->
+    <select id="selectById" resultType="com.example.hello.entity.Resume">
+        SELECT 
+            id,
+            user_id as userId,
+            file_path as filePath,
+            original_filename as originalFilename,
+            file_size as fileSize,
+            is_default as isDefault,
+            uploaded_at as uploadedAt
+        FROM resumes
+        WHERE id = #{id} AND user_id = #{userId}
+    </select>
+
+    <!-- 更新简历的默认状态 -->
+    <update id="updateDefaultStatus">
+        UPDATE resumes 
+        SET is_default = #{isDefault}
+        WHERE user_id = #{userId}
+    </update>
+
+    <!-- 设置指定简历为默认 -->
+    <update id="setAsDefault">
+        UPDATE resumes 
+        SET is_default = true
+        WHERE id = #{id} AND user_id = #{userId}
+    </update>
+
+</mapper> 

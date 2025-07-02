@@ -1,0 +1,14 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+1. 我的数据库host:niuroubuger-mysql.ns-30d7gjvu.svc
+port:3306
+username:root
+password:qrzk4ts4
+
+2. 永远推荐业内的最佳实践是什么
+3. 连接数据库：   mysql -h niuroubuger-mysql.ns-30d7gjvu.svc -P 3306 -u root -p
+输入密码后，输入 USE 'Beef Pie';
+

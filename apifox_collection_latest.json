@@ -1,0 +1,212 @@
+{
+  "info": {
+    "name": "招聘系统API测试集合（最新）",
+    "description": "基于最新接口文档的全量接口测试集合，字段、路径、参数、返回全部与API_INTERFACE_DOC.md一致。",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "name": "生产环境",
+      "url": "https://xyyjfypjlsbg.sealosbja.site"
+    }
+  ],
+  "environments": [
+    {
+      "name": "生产环境",
+      "variables": [
+        { "name": "baseUrl", "value": "https://xyyjfypjlsbg.sealosbja.site" },
+        { "name": "user_id", "value": "1" },
+        { "name": "job_id", "value": "1" },
+        { "name": "resume_id", "value": "1" },
+        { "name": "application_id", "value": "1" }
+      ]
+    }
+  ],
+  "folders": [
+    {
+      "name": "用户管理",
+      "items": [
+        {
+          "name": "用户注册",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/users",
+            "headers": [
+              { "name": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "json",
+              "json": {
+                "name": "测试用户",
+                "email": "test@example.com",
+                "phone_number": "13800138000"
+              }
+            }
+          },
+          "test": [
+            "pm.test(\"状态码为200\", function () { pm.response.to.have.status(200); });",
+            "pm.test(\"返回user_id\", function () { pm.expect(pm.response.json().data.user_id).to.exist; });",
+            "pm.environment.set(\"user_id\", pm.response.json().data.user_id);"
+          ]
+        },
+        {
+          "name": "获取用户信息",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/users/{{user_id}}"
+          },
+          "test": [
+            "pm.test(\"状态码为200\", function () { pm.response.to.have.status(200); });",
+            "pm.test(\"返回用户信息\", function () { pm.expect(pm.response.json().data.name).to.exist; });"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "简历管理",
+      "items": [
+        {
+          "name": "上传简历",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/resumes/upload",
+            "headers": [
+              { "name": "Content-Type", "value": "multipart/form-data" }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "user_id", "value": "{{user_id}}" },
+                { "key": "file", "type": "file", "src": [] }
+              ]
+            }
+          },
+          "test": [
+            "pm.test(\"状态码为200\", function () { pm.response.to.have.status(200); });",
+            "pm.test(\"返回resume_id\", function () { pm.expect(pm.response.json().data.resume_id).to.exist; });",
+            "pm.environment.set(\"resume_id\", pm.response.json().data.resume_id);"
+          ]
+        },
+        {
+          "name": "获取用户简历列表",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/resumes/users/{{user_id}}"
+          },
+          "test": [
+            "pm.test(\"状态码为200\", function () { pm.response.to.have.status(200); });",
+            "pm.test(\"返回简历数组\", function () { pm.expect(pm.response.json().data).to.be.an('array'); });"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "职位管理",
+      "items": [
+        {
+          "name": "获取职位详情",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/jobs/{{job_id}}"
+          },
+          "test": [
+            "pm.test(\"状态码为200\", function () { pm.response.to.have.status(200); });",
+            "pm.test(\"返回职位信息\", function () { pm.expect(pm.response.json().data.title).to.exist; });"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "申请管理",
+      "items": [
+        {
+          "name": "提交职位申请",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/applications",
+            "headers": [
+              { "name": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "json",
+              "json": {
+                "job_id": "{{job_id}}",
+                "user_id": "{{user_id}}",
+                "resume_id": "{{resume_id}}"
+              }
+            }
+          },
+          "test": [
+            "pm.test(\"状态码为200\", function () { pm.response.to.have.status(200); });",
+            "pm.test(\"返回application_id\", function () { pm.expect(pm.response.json().data.application_id).to.exist; });",
+            "pm.environment.set(\"application_id\", pm.response.json().data.application_id);"
+          ]
+        },
+        {
+          "name": "获取申请详情",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/applications/{{application_id}}"
+          },
+          "test": [
+            "pm.test(\"状态码为200\", function () { pm.response.to.have.status(200); });",
+            "pm.test(\"返回申请详情\", function () { pm.expect(pm.response.json().data.application_id).to.exist; });"
+          ]
+        },
+        {
+          "name": "获取用户所有申请",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/applications/user/{{user_id}}"
+          },
+          "test": [
+            "pm.test(\"状态码为200\", function () { pm.response.to.have.status(200); });",
+            "pm.test(\"返回申请数组\", function () { pm.expect(pm.response.json().data).to.be.an('array'); });"
+          ]
+        },
+        {
+          "name": "获取职位所有申请",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/applications/job/{{job_id}}"
+          },
+          "test": [
+            "pm.test(\"状态码为200\", function () { pm.response.to.have.status(200); });",
+            "pm.test(\"返回申请数组\", function () { pm.expect(pm.response.json().data).to.be.an('array'); });"
+          ]
+        },
+        {
+          "name": "更新申请状态",
+          "request": {
+            "method": "PUT",
+            "url": "{{baseUrl}}/api/applications/{{application_id}}/status",
+            "headers": [
+              { "name": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "json",
+              "json": {
+                "status": "已通过"
+              }
+            }
+          },
+          "test": [
+            "pm.test(\"状态码为200\", function () { pm.response.to.have.status(200); });",
+            "pm.test(\"状态更新成功\", function () { pm.expect(pm.response.json().message).to.include(\"成功\"); });"
+          ]
+        },
+        {
+          "name": "删除申请",
+          "request": {
+            "method": "DELETE",
+            "url": "{{baseUrl}}/api/applications/{{application_id}}"
+          },
+          "test": [
+            "pm.test(\"状态码为200\", function () { pm.response.to.have.status(200); });",
+            "pm.test(\"删除成功\", function () { pm.expect(pm.response.json().message).to.include(\"成功\"); });"
+          ]
+        }
+      ]
+    }
+  ]
+} 

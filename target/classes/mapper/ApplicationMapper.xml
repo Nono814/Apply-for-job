@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.hello.mapper.ApplicationMapper">
+
+    <!-- 结果映射 -->
+    <resultMap id="ApplicationWithDetailsMap" type="com.example.hello.entity.Application">
+        <id property="id" column="application_id"/>
+        <result property="jobId" column="job_id"/>
+        <result property="userId" column="user_id"/>
+        <result property="resumeId" column="resume_id"/>
+        <result property="status" column="status"/>
+        <result property="submittedAt" column="applied_at"/>
+        <association property="job" javaType="com.example.hello.entity.Job">
+            <id property="id" column="job_id"/>
+            <result property="title" column="job_title"/>
+            <association property="company" javaType="com.example.hello.entity.Company">
+                <id property="id" column="company_id"/>
+                <result property="name" column="company_name"/>
+            </association>
+        </association>
+        <association property="applicant" javaType="com.example.hello.entity.User">
+            <id property="id" column="user_id"/>
+            <result property="name" column="applicant_name"/>
+        </association>
+        <association property="resume" javaType="com.example.hello.entity.Resume">
+            <id property="id" column="resume_id"/>
+            <result property="originalFilename" column="resume_filename"/>
+        </association>
+    </resultMap>
+
+    <!-- 插入新申请 -->
+    <insert id="insert" parameterType="com.example.hello.entity.Application" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO applications (job_id, user_id, resume_id, status, applied_at)
+        VALUES (#{jobId}, #{userId}, #{resumeId}, #{status}, NOW())
+    </insert>
+
+    <!-- 根据ID查询申请详情（包含职位、用户、简历信息） -->
+    <select id="selectApplicationWithDetailsById" resultMap="ApplicationWithDetailsMap">
+        SELECT 
+            a.id as application_id,
+            a.job_id,
+            a.user_id,
+            a.resume_id,
+            a.status,
+            a.applied_at,
+            j.title as job_title,
+            c.id as company_id,
+            c.name as company_name,
+            u.name as applicant_name,
+            r.original_filename as resume_filename
+        FROM applications a
+        LEFT JOIN jobs j ON a.job_id = j.id
+        LEFT JOIN companies c ON j.company_id = c.id
+        LEFT JOIN users u ON a.user_id = u.id
+        LEFT JOIN resumes r ON a.resume_id = r.id
+        WHERE a.id = #{id}
+    </select>
+
+    <!-- 根据ID查询申请基本信息 -->
+    <select id="selectById" resultType="com.example.hello.entity.Application">
+        SELECT 
+            id,
+            job_id as jobId,
+            user_id as userId,
+            resume_id as resumeId,
+            status,
+            applied_at as submittedAt
+        FROM applications
+        WHERE id = #{id}
+    </select>
+
+    <!-- 检查是否已经申请过该职位 -->
+    <select id="countByJobIdAndUserId" resultType="int">
+        SELECT COUNT(*)
+        FROM applications
+        WHERE job_id = #{jobId} AND user_id = #{userId}
+    </select>
+
+    <!-- 根据申请人ID查询申请列表 -->
+    <select id="selectByUserId" resultMap="ApplicationWithDetailsMap">
+        SELECT 
+            a.id as application_id,
+            a.job_id,
+            a.user_id,
+            a.resume_id,
+            a.status,
+            a.applied_at,
+            j.title as job_title,
+            c.id as company_id,
+            c.name as company_name,
+            u.name as applicant_name,
+            r.original_filename as resume_filename
+        FROM applications a
+        LEFT JOIN jobs j ON a.job_id = j.id
+        LEFT JOIN companies c ON j.company_id = c.id
+        LEFT JOIN users u ON a.user_id = u.id
+        LEFT JOIN resumes r ON a.resume_id = r.id
+        WHERE a.user_id = #{userId}
+        ORDER BY a.applied_at DESC
+    </select>
+
+    <!-- 根据职位ID查询申请列表 -->
+    <select id="selectByJobId" resultMap="ApplicationWithDetailsMap">
+        SELECT 
+            a.id as application_id,
+            a.job_id,
+            a.user_id,
+            a.resume_id,
+            a.status,
+            a.applied_at,
+            j.title as job_title,
+            c.id as company_id,
+            c.name as company_name,
+            u.name as applicant_name,
+            r.original_filename as resume_filename
+        FROM applications a
+        LEFT JOIN jobs j ON a.job_id = j.id
+        LEFT JOIN companies c ON j.company_id = c.id
+        LEFT JOIN users u ON a.user_id = u.id
+        LEFT JOIN resumes r ON a.resume_id = r.id
+        WHERE a.job_id = #{jobId}
+        ORDER BY a.applied_at DESC
+    </select>
+
+    <!-- 根据状态查询申请列表 -->
+    <select id="selectByStatus" resultMap="ApplicationWithDetailsMap">
+        SELECT 
+            a.id as application_id,
+            a.job_id,
+            a.user_id,
+            a.resume_id,
+            a.status,
+            a.applied_at,
+            j.title as job_title,
+            c.id as company_id,
+            c.name as company_name,
+            u.name as applicant_name,
+            r.original_filename as resume_filename
+        FROM applications a
+        LEFT JOIN jobs j ON a.job_id = j.id
+        LEFT JOIN companies c ON j.company_id = c.id
+        LEFT JOIN users u ON a.user_id = u.id
+        LEFT JOIN resumes r ON a.resume_id = r.id
+        WHERE a.status = #{status}
+        ORDER BY a.applied_at DESC
+    </select>
+
+    <!-- 更新申请状态 -->
+    <update id="updateStatus">
+        UPDATE applications 
+        SET status = #{status}, applied_at = NOW()
+        WHERE id = #{id}
+    </update>
+
+    <!-- 分页查询申请列表 -->
+    <select id="selectWithPagination" resultMap="ApplicationWithDetailsMap">
+        SELECT 
+            a.id as application_id,
+            a.job_id,
+            a.user_id,
+            a.resume_id,
+            a.status,
+            a.applied_at,
+            j.title as job_title,
+            c.id as company_id,
+            c.name as company_name,
+            u.name as applicant_name,
+            r.original_filename as resume_filename
+        FROM applications a
+        LEFT JOIN jobs j ON a.job_id = j.id
+        LEFT JOIN companies c ON j.company_id = c.id
+        LEFT JOIN users u ON a.user_id = u.id
+        LEFT JOIN resumes r ON a.resume_id = r.id
+        ORDER BY a.applied_at DESC
+        LIMIT #{offset}, #{limit}
+    </select>
+
+    <!-- 统计申请总数 -->
+    <select id="countTotal" resultType="int">
+        SELECT COUNT(*) FROM applications
+    </select>
+
+    <delete id="deleteById">
+        DELETE FROM applications WHERE id = #{id}
+    </delete>
+
+</mapper> 
