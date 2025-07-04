@@ -1,4 +1,6 @@
 /home/devbox/project/src/main/java/com/example/hello/HelloApplication.java
+/home/devbox/project/src/main/java/com/example/hello/config/ObjectStorageConfig.java
+/home/devbox/project/src/main/java/com/example/hello/config/WebConfig.java
 /home/devbox/project/src/main/java/com/example/hello/controller/ApplicationController.java
 /home/devbox/project/src/main/java/com/example/hello/controller/JobApplicationController.java
 /home/devbox/project/src/main/java/com/example/hello/controller/JobController.java
@@ -23,5 +25,6 @@
 /home/devbox/project/src/main/java/com/example/hello/service/ApplicationService.java
 /home/devbox/project/src/main/java/com/example/hello/service/JobApplicationService.java
 /home/devbox/project/src/main/java/com/example/hello/service/JobService.java
+/home/devbox/project/src/main/java/com/example/hello/service/ObjectStorageService.java
 /home/devbox/project/src/main/java/com/example/hello/service/ResumeService.java
 /home/devbox/project/src/main/java/com/example/hello/service/UserService.java

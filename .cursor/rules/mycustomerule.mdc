@@ -9,6 +9,10 @@ username:root
 password:qrzk4ts4
 
 2. 永远推荐业内的最佳实践是什么
+
 3. 连接数据库：   mysql -h niuroubuger-mysql.ns-30d7gjvu.svc -P 3306 -u root -p
 输入密码后，输入 USE 'Beef Pie';
 
+4. 每天晚上20:00，如果你还在，帮我用git备份一下当前的所有代码。我的用户名是"olala814"，邮箱是"zzw814@163.com"
+
+5. 生成代码后，也请帮我生成对应的注释，把我当成一个编程初学者，生成带有教学性质的注释，目的是让我更好的学习编程。

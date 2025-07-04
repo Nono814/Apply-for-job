@@ -40,7 +40,7 @@ public class ApplicationService {
         application.setJobId(jobId);
         application.setUserId(userId);
         application.setResumeId(resumeId);
-        application.setStatus("pending"); // 待处理状态
+        application.setStatus("submitted"); // 初始状态
         
         applicationMapper.insert(application);
         

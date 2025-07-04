@@ -4,8 +4,8 @@
 
     <!-- 插入新简历 -->
     <insert id="insert" parameterType="com.example.hello.entity.Resume" useGeneratedKeys="true" keyProperty="id">
-        INSERT INTO resumes (user_id, file_path, original_filename, file_size, is_default)
-        VALUES (#{userId}, #{filePath}, #{originalFilename}, #{fileSize}, #{isDefault})
+        INSERT INTO resumes (user_id, file_path, original_filename, file_size, is_default, uploaded_at, file_hash)
+        VALUES (#{userId}, #{filePath}, #{originalFilename}, #{fileSize}, #{isDefault}, #{uploadedAt}, #{fileHash})
     </insert>
 
     <!-- 根据用户ID查询简历列表 -->
@@ -17,7 +17,8 @@
             original_filename as originalFilename,
             file_size as fileSize,
             is_default as isDefault,
-            uploaded_at as uploadedAt
+            uploaded_at as uploadedAt,
+            file_hash as fileHash
         FROM resumes
         WHERE user_id = #{userId}
         ORDER BY uploaded_at DESC
@@ -32,7 +33,8 @@
             original_filename as originalFilename,
             file_size as fileSize,
             is_default as isDefault,
-            uploaded_at as uploadedAt
+            uploaded_at as uploadedAt,
+            file_hash as fileHash
         FROM resumes
         WHERE id = #{id} AND user_id = #{userId}
     </select>
@@ -50,5 +52,20 @@
         SET is_default = true
         WHERE id = #{id} AND user_id = #{userId}
     </update>
+
+    <select id="selectByUserIdAndFileHash" resultType="com.example.hello.entity.Resume">
+        SELECT 
+            id,
+            user_id as userId,
+            file_path as filePath,
+            original_filename as originalFilename,
+            file_size as fileSize,
+            is_default as isDefault,
+            uploaded_at as uploadedAt,
+            file_hash as fileHash
+        FROM resumes
+        WHERE user_id = #{userId} AND file_hash = #{fileHash}
+        LIMIT 1
+    </select>
 
 </mapper> 

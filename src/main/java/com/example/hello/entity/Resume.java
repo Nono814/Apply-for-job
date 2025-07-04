@@ -13,6 +13,7 @@ public class Resume {
     private Integer fileSize;
     private Boolean isDefault;
     private LocalDateTime uploadedAt;
+    private String fileHash; // 文件内容哈希值，用于去重
 
     // 构造函数
     public Resume() {}
@@ -72,6 +73,14 @@ public class Resume {
 
     public void setUploadedAt(LocalDateTime uploadedAt) {
         this.uploadedAt = uploadedAt;
+    }
+
+    public String getFileHash() {
+        return fileHash;
+    }
+
+    public void setFileHash(String fileHash) {
+        this.fileHash = fileHash;
     }
 
     @Override

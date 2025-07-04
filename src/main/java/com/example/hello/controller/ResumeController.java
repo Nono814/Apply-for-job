@@ -41,6 +41,7 @@ public class ResumeController {
     
     /**
      * 上传简历（兼容接口文档路径）
+     * 支持PDF、DOCX、DOC格式，最大3MB
      */
     @PostMapping("/resumes/upload")
     public ApiResponse<Map<String, Object>> uploadResumeByDoc(
@@ -48,11 +49,24 @@ public class ResumeController {
             @RequestParam("file") MultipartFile file) {
         // 复用已有的上传逻辑，默认 isDefault=false
         Map<String, Object> result = resumeService.uploadResume(file, userId, false);
+        
+        // 检查是否为重复上传（409冲突）
+        if ("DUPLICATE".equals(result.get("status"))) {
+            return ApiResponse.error(409, "您已上传过相同内容的简历文件！");
+        }
+        
+        // 检查其他错误
         if (result.containsKey("message") && result.get("message").toString().contains("失败")) {
             return ApiResponse.error(result.get("message").toString());
         }
-        // 返回格式与接口文档保持一致
-        return ApiResponse.success(result.get("message").toString(), result);
+        
+        // 构造符合接口文档的返回格式（只有非重复上传才返回成功）
+        Map<String, Object> responseData = Map.of(
+            "resume_id", result.get("resume_id") != null ? result.get("resume_id") : 0,
+            "file_url", result.get("file_url") != null ? result.get("file_url") : ""
+        );
+        
+        return ApiResponse.success("简历上传成功", responseData);
     }
     
     /**
@@ -66,8 +80,8 @@ public class ResumeController {
             .map(resume -> {
                 Map<String, Object> resumeMap = Map.of(
                     "resume_id", resume.getId(),
-                    "filename", resume.getOriginalFilename(),
-                    "uploaded_at", resume.getUploadedAt().toString(),
+                    "filename", resume.getOriginalFilename() != null ? resume.getOriginalFilename() : "",
+                    "uploaded_at", resume.getUploadedAt() != null ? resume.getUploadedAt().toString() : "",
                     "is_default", resume.getIsDefault()
                 );
                 return resumeMap;

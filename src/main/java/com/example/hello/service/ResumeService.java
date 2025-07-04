@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.util.DigestUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -29,31 +30,52 @@ public class ResumeService {
     @Autowired
     private ResumeMapper resumeMapper;
     
+    @Autowired
+    private ObjectStorageService objectStorageService;
+    
     @Value("${file.upload.path}")
     private String uploadPath;
     
     /**
      * 上传简历
+     * 使用对象存储服务上传文件，支持PDF、DOCX、DOC格式
      */
     @Transactional
     public Map<String, Object> uploadResume(MultipartFile file, Integer userId, Boolean isDefault) {
         Map<String, Object> result = new HashMap<>();
         
         try {
-            // 创建上传目录
-            Path uploadDir = Paths.get(uploadPath);
-            if (!Files.exists(uploadDir)) {
-                Files.createDirectories(uploadDir);
+            // 验证文件类型
+            String originalFilename = file.getOriginalFilename();
+            if (!objectStorageService.isValidFileType(originalFilename)) {
+                result.put("message", "不支持的文件类型，仅支持PDF、DOCX、DOC格式");
+                return result;
             }
             
-            // 生成唯一文件名
-            String originalFilename = file.getOriginalFilename();
-            String fileExtension = originalFilename.substring(originalFilename.lastIndexOf("."));
-            String newFilename = UUID.randomUUID().toString() + fileExtension;
+            // 验证文件大小（最大3MB）
+            if (!objectStorageService.isValidFileSize(file.getSize(), 3)) {
+                result.put("message", "文件大小超过限制，最大支持3MB");
+                return result;
+            }
             
-            // 保存文件
-            Path filePath = uploadDir.resolve(newFilename);
-            Files.copy(file.getInputStream(), filePath);
+            // 计算文件内容的MD5哈希值
+            String fileHash = DigestUtils.md5DigestAsHex(file.getInputStream());
+            // 查重：同一用户已上传过相同内容的简历
+            Resume exist = resumeMapper.selectByUserIdAndFileHash(userId, fileHash);
+            if (exist != null) {
+                result.put("status", "DUPLICATE"); // 添加状态标识，用于控制器判断
+                result.put("message", "您已上传过相同内容的简历文件！");
+                result.put("resume_id", exist.getId());
+                result.put("file_url", exist.getFilePath());
+                return result;
+            }
+            
+            // 上传文件到对象存储
+            String fileUrl = objectStorageService.uploadFile(
+                file.getInputStream(), 
+                originalFilename, 
+                file.getContentType()
+            );
             
             // 如果设置为默认，先取消其他简历的默认状态
             if (Boolean.TRUE.equals(isDefault)) {
@@ -63,15 +85,17 @@ public class ResumeService {
             // 保存简历信息到数据库
             Resume resume = new Resume();
             resume.setUserId(userId);
-            resume.setFilePath(filePath.toString());
+            resume.setFilePath(fileUrl); // 存储文件URL而不是本地路径
             resume.setOriginalFilename(originalFilename);
             resume.setFileSize((int) file.getSize());
             resume.setIsDefault(Boolean.TRUE.equals(isDefault));
+            resume.setUploadedAt(LocalDateTime.now());
+            resume.setFileHash(fileHash); // 存储文件哈希
             
             resumeMapper.insert(resume);
             
             result.put("resume_id", resume.getId());
-            result.put("filename", originalFilename);
+            result.put("file_url", fileUrl); // 返回文件URL
             result.put("message", "简历上传成功");
             
         } catch (IOException e) {

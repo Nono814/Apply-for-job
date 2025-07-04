@@ -36,4 +36,9 @@ public interface ResumeMapper {
      * 设置指定简历为默认
      */
     int setAsDefault(@Param("id") Integer id, @Param("userId") Integer userId);
+    
+    /**
+     * 根据用户ID和文件哈希查找简历（用于去重）
+     */
+    Resume selectByUserIdAndFileHash(@Param("userId") Integer userId, @Param("fileHash") String fileHash);
 } 

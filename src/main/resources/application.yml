@@ -29,4 +29,13 @@ pagehelper:
 # 文件上传配置
 file:
   upload:
-    path: /tmp/uploads/ 
+    path: /tmp/uploads/
+
+# 对象存储配置
+object:
+  storage:
+    access-key: tqd6953k
+    secret-key: rlnqfq8c77tz9phq
+    endpoint: https://objectstorageapi.hzh.sealos.run
+    external-endpoint: https://objectstorageapi.hzh.sealos.run
+    bucket: tqd6953k-yaxianzhi 
