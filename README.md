@@ -10,13 +10,6 @@
 - **PageHelper 1.4.7** - 分页插件
 - **Java 17** - 编程语言
 
-## 数据库配置
-
-- 主机：<your-mysql-host>
-- 端口：<your-mysql-port>
-- 用户名：<your-username>
-- 密码：<your-password>
-- 数据库：<your-database>
 
 ## 用户注册和申请流程
 
