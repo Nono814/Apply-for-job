@@ -1,0 +1,14 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+1. Figma MCP 对应的内容地址是： http://127.0.0.1:3845/sse，需要严格按照figma里的原型图的样式设计
+
+2. 生成代码后，也请帮我生成对应的注释，把我当成一个编程初学者，生成带有教学性质的注释，目的是让我更好的学习编程。
+
+3. 前端要访问的服务端的访问地址为：http://bishengke.ns-30d7gjvu.svc.cluster.local:8080
+
+4. 每天晚上20:00，如果你还在，帮我用git备份一下当前的所有代码。我的用户名是"olala814"，邮箱是"zzw814@163.com"。同时保存到github代码仓库里，代码仓库的URL是：https://github.com/Nono814/Apply-for-job.git
+
+
